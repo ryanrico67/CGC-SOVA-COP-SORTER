@@ -258,10 +258,10 @@ input[type="text"]::placeholder{color:var(--text-dim);}
   <!-- STEP 2: Site Name -->
   <div class="step" id="step2">
     <div class="card" style="max-width:520px;margin:2rem auto;">
-      <h2 id="step2Title">Enter Site Name</h2>
-      <p class="sub" id="step2Desc">Used as prefix for all files and folders.</p>
+      <h2 id="step2Title">Enter Site Name & FuzeID</h2>
+      <p class="sub" id="step2Desc">Both are used for file/folder naming.</p>
       <div id="siteNameGroup"><label style="font-size:.68rem;color:var(--text-dim);display:block;margin-bottom:.3rem;">Site Name</label><input type="text" id="siteName" placeholder="e.g. Tower-XYZ-0042"></div>
-      <div id="fuzeIdGroup" style="display:none;margin-top:.75rem;"><label style="font-size:.68rem;color:var(--text-dim);display:block;margin-bottom:.3rem;">FuzeID</label><input type="text" id="fuzeId" placeholder="e.g. FZ12345"></div>
+      <div id="fuzeIdGroup" style="margin-top:.75rem;"><label style="font-size:.68rem;color:var(--text-dim);display:block;margin-bottom:.3rem;">FuzeID</label><input type="text" id="fuzeId" placeholder="e.g. FZ12345"></div>
       <div id="prefixToggle" style="margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border);">
         <p style="font-size:.72rem;color:var(--text-dim);margin-bottom:.5rem;font-weight:600;">File Renaming</p>
         <div class="opt-row" style="justify-content:center;">
@@ -541,21 +541,21 @@ $('#step1Next').addEventListener('click',()=>{
   const labels={embedded:'CGC / Embedded',newbuild:'CGC / NSB',sova:sovaScope==='48hr'?'SOVA 48HR':'SOVA Full'};
   $('#typeBadge').textContent=labels[selectedType];$('#typeBadge').style.display='';
   $('#rulesBadge').textContent=MAPPINGS.length+' RULES';
-  if(isSova()||projectType==='embedded'){$('#step2Title').textContent='Enter Site Name & FuzeID';$('#step2Desc').textContent='Both are used for file/folder naming.';$('#fuzeIdGroup').style.display='';$('#siteNameGroup').style.display='';}
-  else{$('#step2Title').textContent='Enter Site Name';$('#step2Desc').textContent='Used as prefix for all files and folders.';$('#fuzeIdGroup').style.display='none';$('#siteNameGroup').style.display='';}
+  if(selectedType==='newbuild'){document.getElementById('step2Title').textContent='Enter Site Name';document.getElementById('step2Desc').textContent='Used as prefix for all files and folders.';document.getElementById('fuzeIdGroup').style.display='none';}
+  else{document.getElementById('step2Title').textContent='Enter Site Name & FuzeID';document.getElementById('step2Desc').textContent='Both are used for file/folder naming.';document.getElementById('fuzeIdGroup').style.display='block';}
   goStep(2);$('#siteName').focus();});
 
 // ═══ STEP 2 ═══
-function checkStep2(){var sn=$('#siteName').value.trim();if(isSova()||projectType==='embedded'){var fz=$('#fuzeId').value.trim();$('#step2Next').disabled=!(sn&&fz);}else{$('#step2Next').disabled=!sn;}}
+function checkStep2(){var sn=document.getElementById('siteName').value.trim();if(selectedType==='newbuild'){document.getElementById('step2Next').disabled=!sn;}else{var fz=document.getElementById('fuzeId').value.trim();document.getElementById('step2Next').disabled=!(sn&&fz);}}
 $('#siteName').addEventListener('input',checkStep2);
 document.getElementById('fuzeId').addEventListener('input',checkStep2);
 var usePrefix=true;
 $$('[data-prefix]').forEach(function(btn){btn.addEventListener('click',function(){$$('[data-prefix]').forEach(function(b){b.classList.remove('selected');});btn.classList.add('selected');usePrefix=btn.dataset.prefix==='yes';var hint=document.getElementById('prefixHint');if(usePrefix){hint.textContent=isSova()?'Files renamed with FuzeID prefix':projectType==='embedded'?'Photos: SiteName prefix | Docs: COP-SiteName-FuzeID prefix':'Files renamed with COP - SiteName prefix';}else{hint.textContent='Files keep original names, only sorted into folders.';}});});
 
-$('#siteName').addEventListener('keydown',e=>{if(e.key==='Enter'){if(isSova()||projectType==='embedded')document.getElementById('fuzeId').focus();else if($('#siteName').value.trim())$('#step2Next').click();}});
+$('#siteName').addEventListener('keydown',e=>{if(e.key==='Enter'){if(selectedType!=='newbuild')document.getElementById('fuzeId').focus();else if($('#siteName').value.trim())$('#step2Next').click();}});
 document.getElementById('fuzeId').addEventListener('keydown',e=>{if(e.key==='Enter'&&$('#fuzeId').value.trim()&&$('#siteName').value.trim())$('#step2Next').click();});
 $('#step2Next').addEventListener('click',()=>{siteName=$('#siteName').value.trim();fuzeId=document.getElementById('fuzeId').value.trim();
-  $('#siteLabel').textContent=(isSova()||projectType==='embedded')?siteName+' / '+fuzeId:siteName;$('#siteLabel').style.display='';goStep(3);});
+  $('#siteLabel').textContent=(projectType!=='newbuild')?siteName+' / '+fuzeId:siteName;$('#siteLabel').style.display='';goStep(3);});
 
 // ═══ STEP 3 ═══
 var dropzone=$('#dropzone');
